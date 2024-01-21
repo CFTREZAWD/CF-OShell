@@ -134,8 +134,6 @@ def cmd():
                     lines = f.read()
                     for i, line in enumerate(lines):
                         print(line, end='')
-                    if lines == '' or ' ':
-                        print("Error : The File is blank.")
             except FileNotFoundError:
                 print(f"The file {filename} was not found.")
             except Exception:
