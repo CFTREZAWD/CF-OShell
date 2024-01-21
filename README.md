@@ -9,7 +9,9 @@ CF-OShell is a simple command-line shell written in Python. It has a few basic f
 - An ip command that displays your public IP address.
 - A wms command that opens the Webhook Message Sender for Discord.
 - A ls command that lists the files and directories in the current directory.
-- A cd command that changes the current directory. (Actually Working on it.)
+- A cd command that changes the current directory.
+- A open command to print the content of the file that you want.
+- a ren command to rename the file that you want.
 
 ## Getting Started
 
@@ -62,4 +64,4 @@ CF-OShell is a simple command-line shell that is perfect for beginners. It is ea
 
 
 
-Helped with blackbox AI (www.blackbox.ai)
+Helped with Blackbox AI (www.blackbox.ai)
