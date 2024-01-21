@@ -28,7 +28,7 @@ cd CF-OShell
 To run the shell, simply type the following command:
 
 ```
-python CF-OShell
+python begin.py
 ```
 
 ## Using the Shell
