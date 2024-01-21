@@ -4,7 +4,7 @@ import CF_OShell
 
 def boot():
     print("Welcome to CF-OShell. The worst shell ever created ! ")
-    time.sleep(0.5)
+    time.sleep(2)
     print("Booting...")
 
 if __name__ == "__main__":
