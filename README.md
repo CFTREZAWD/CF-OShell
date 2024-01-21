@@ -59,3 +59,7 @@ To edit the `config.py` file, open it in a text editor and make the desired chan
 
 CF-OShell is a simple command-line shell that is perfect for beginners. It is easy to use and customize, and it has a number of features that make it a great choice for everyday use.
 
+
+
+
+Helped with blackbox AI (www.blackbox.ai)
