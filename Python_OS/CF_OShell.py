@@ -7,8 +7,12 @@ import os
 import colorama
 from config import color_map, prompt
 import stat
+from datetime import datetime
+import pytz
 
 colorama.init()
+
+timezone = pytz.timezone("Europe/Paris")
 
 WELCOME_MESSAGE = colorama.Fore.YELLOW + "Welcome to CF-OShell! Type 'help' for a list of commands." + colorama.Style.RESET_ALL
 def print_welcome_message():
@@ -64,7 +68,7 @@ def cmd():
     cwd_path = colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL
     print_welcome_message()
     while True:
-        inp = input(f"{prompt} {cwd_path}{colorama.Fore.BLUE}${colorama.Style.RESET_ALL} ")
+        inp = input(f"\n{prompt} {cwd_path}{colorama.Fore.BLUE}${colorama.Style.RESET_ALL} ")
         if inp == 'help':
             print("""
                  
@@ -127,8 +131,8 @@ def cmd():
             # Update the cwd_path variable after changing the current directory
             cwd_path = colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL
             
-        elif inp == 'open':
-            filename = input("Name of the file you want to open : ")
+        elif inp.startswith('open '):
+            filename = inp[5:]
             try:
                 with open(filename) as f:
                     lines = f.read()
@@ -151,5 +155,34 @@ def cmd():
                     print("invalid Input")
             except FileNotFoundError:
                 print(f'File {file1} not found.')
+        elif inp == 'date':
+            date = datetime.now(timezone)
+            print(date)
+        elif inp.startswith('rm '):
+            try:
+                filetd = inp[3:]
+                rm_yn = input(f"Are you sure you want to delete {filetd} ? (y/n) : ")
+                if rm_yn == 'y':
+                    os.remove(filetd)
+                    print(f"Removed {filetd}")
+                elif rm_yn == 'n':
+                    pass
+                else:
+                    print("Invalid Input")
+            except FileNotFoundError:
+                print("File not found.")
+        elif inp.startswith('mk '):
+            try:
+                filetm = inp[3:]
+                aystm = input(f"Are you sure you want to make {filetm} ? (y/n) : ")
+                if aystm == 'y':
+                    with open(filetm, 'w') as f:
+                        print(f"Maked {filetm}.")
+                elif aystm == 'n':
+                    print("Canceled operation")
+                else:
+                    print("Invalid Input")
+            except Exception as e:
+                print(f"Error while making the file : {e}")
         else:
             print("Wrong command, view 'help' for help.")
