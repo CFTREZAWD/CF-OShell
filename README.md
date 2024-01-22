@@ -67,4 +67,4 @@ CF-OShell is a simple command-line shell that is perfect for beginners. It is ea
 
 
 
-Helped with Blackbox AI (www.blackbox.ai)
+Partially Helped by Blackbox AI (www.blackbox.ai)
