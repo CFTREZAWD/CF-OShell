@@ -2,16 +2,18 @@
 
 CF-OShell is a simple command-line shell written in Python. It has a few basic features, including:
 
-- A help command that displays a list of available commands.
-- A version command that displays the version of the shell.
-- A team command that displays the names of the people who created the shell.
-- An exit command that exits the shell.
-- An ip command that displays your public IP address.
-- A wms command that opens the Webhook Message Sender for Discord.
-- A ls command that lists the files and directories in the current directory.
-- A cd command that changes the current directory.
-- A open command to print the content of the file that you want.
-- a ren command to rename the file that you want.
+- A help command that displays a list of available commands. (`help`)
+- A version command that displays the version of the shell. (`ver`)
+- A team command that displays the names of the people who created the shell. (`team`)
+- An exit command that exits the shell. (`exit`)
+- An ip command that displays your public IP address. (`ip`)
+- A wms command that opens the Webhook Message Sender for Discord. (`wms`)
+- A ls command that lists the files and directories in the current directory. (`ls`)
+- A cd command that changes the current directory. (`cd`)
+- A open command to print the content of the file that you want. (`open`)
+- A ren command to rename the file that you want. (`ren`)
+- A rm command to remove the file that you want. (`rm`)
+- A mk command to create the file that you want. (`mk`)
 
 ## Getting Started
 
@@ -25,6 +27,7 @@ Once you have cloned the repository, open a terminal window and navigate to the 
 
 ```
 cd CF-OShell
+cd Python_OS
 ```
 
 To run the shell, simply type the following command:
