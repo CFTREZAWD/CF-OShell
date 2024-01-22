@@ -21,7 +21,7 @@ def print_welcome_message():
 current_directory = os.getcwd()
 
 USERS = {'root': 'root'}
-COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren']
+COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk']
 
 def login():
     username = input("Username: ").lower()
