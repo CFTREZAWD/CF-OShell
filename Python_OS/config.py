@@ -11,4 +11,7 @@ color_map = {
         'exec': colorama.Fore.MAGENTA
     }
 
-prompt = f"{colorama.Fore.LIGHTMAGENTA_EX}CF-OShell>{colorama.Style.RESET_ALL}"
+prompt = f"{colorama.Fore.MAGENTA}CF-OShell>{colorama.Style.RESET_ALL}"
+
+
+
