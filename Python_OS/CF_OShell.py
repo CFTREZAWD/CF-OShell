@@ -9,6 +9,7 @@ from config import color_map, prompt
 import stat
 from datetime import datetime
 import pytz
+import log
 
 colorama.init()
 
@@ -20,6 +21,8 @@ def print_welcome_message():
 
 current_directory = os.getcwd()
 
+
+ROOTUSERS = ['root']
 USERS = {'root': 'root'}
 COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk']
 
@@ -29,19 +32,27 @@ def login():
         password = getpass.getpass(prompt = "Password: ").lower()
         if password == USERS[username]:
             print(f"Welcome back, {username}!")
-            cmd()
+            cmd(username)
         else:
-            print(f"Wrong password for {username}")
+            log.Logger.Error(errmessage = "Invalid Input")
             login()
     else:
         newuser(username)
 
+
 def newuser(username):
     global USERS # Declare USERS as a global variable
     new_account = input("Do you want to create a new account? (y/n) ").lower()
+    is_root = input("Is the User Root ? (y/n) : ")
     if new_account == 'y':
         password = getpass.getpass(prompt = "New Password: ").lower()
         USERS[username] = password
+        if is_root == 'y':
+            ROOTUSERS.append(username)
+        elif is_root == 'n':
+            pass
+        else:
+            log.Logger.Error(errmessage = "Invalid input")
         login()
     else:
         login()
@@ -63,7 +74,7 @@ def ls():
         else:
             print(color_map['file'] + file_or_directory + colorama.Style.RESET_ALL)
 
-def cmd():
+def cmd(user):
     global current_directory
     cwd_path = colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL
     print_welcome_message()
@@ -96,7 +107,7 @@ def cmd():
             surprise = random.choice(COMMANDS)
             print(f"Surprise = {surprise}")
         elif inp == 'team':
-            print("Made by CFTREZAWD.")
+            print("Made by CFTREZAWD")
         elif inp == '':
             pass
         elif inp == 'exit':
@@ -106,10 +117,10 @@ def cmd():
             elif exit_yn == 'n':
                 pass
             else:
-                print("Invalid input")
+                log.Logger.Error(errmessage = "Invalid input")
         elif inp == 'wms':
             wms.wms()
-            print("Opened WMS")
+            log.Logger.info(infmessage = "Opened WMS")
         elif inp == 'ip':
             ip = requests.get("https://api.ipify.org").text
             print(ip)
@@ -139,50 +150,57 @@ def cmd():
                     for i, line in enumerate(lines):
                         print(line, end='')
             except FileNotFoundError:
-                print(f"The file {filename} was not found.")
+                log.Logger.Error(errmessage = f"File {filename} wasn't found.")
             except Exception:
-                print(f"Cannot Open the File : {filename}")
+                log.Logger.Error(errmessage = f"cannot opened File {filename}")
         elif inp.startswith('ren '):
-            try:
-                file1 = inp[3:].strip()
-                newname = input(f'Enter a new name for "{file1}" : ')
-                ren_yn = input(f"Are you sure you want to rename {file1} to {newname} ? (y/n) : ")
-                if ren_yn == 'y':
-                    os.rename(file1, newname)
-                elif ren_yn == 'n':
-                    pass
-                else:
-                    print("invalid Input")
-            except FileNotFoundError:
-                print(f'File {file1} not found.')
+            if user in ROOTUSERS:    
+                try:
+                    file1 = inp[3:].strip()
+                    newname = input(f'Enter a new name for "{file1}" : ')
+                    ren_yn = input(f"Are you sure you want to rename {file1} to {newname} ? (y/n) : ")
+                    if ren_yn == 'y':
+                        os.rename(file1, newname)
+                        log.Logger.info(infmessage = f"Renamed {file1} to {newname}")
+                    elif ren_yn == 'n':
+                        pass
+                    else:
+                        log.Logger.Error(errmessage = f"Invalid Input")
+                except FileNotFoundError:
+                    log.Logger.Error(errmessage = f"File {file1} wasn't found.")
+            elif user not in ROOTUSERS:
+                log.Logger.warning(errmessage = f"User {user} isn't root.")
         elif inp == 'date':
             date = datetime.now(timezone)
             print(date)
         elif inp.startswith('rm '):
-            try:
-                filetd = inp[3:]
-                rm_yn = input(f"Are you sure you want to delete {filetd} ? (y/n) : ")
-                if rm_yn == 'y':
-                    os.remove(filetd)
-                    print(f"Removed {filetd}")
-                elif rm_yn == 'n':
-                    pass
-                else:
-                    print("Invalid Input")
-            except FileNotFoundError:
-                print("File not found.")
+            if user in ROOTUSERS:
+                try:
+                    filetd = inp[3:]
+                    rm_yn = input(f"Are you sure you want to delete {filetd} ? (y/n) : ")
+                    if rm_yn == 'y':
+                        os.remove(filetd)
+                        log.Logger.info(infmessage = f"File {filetd} Removed.")
+                    elif rm_yn == 'n':
+                        pass
+                    else:
+                        log.Logger.Error(errmessage = f"Invalid input")
+                except FileNotFoundError:
+                    log.Logger.Error(errmessage = f"File {filetd} wasn't found.")
+            elif user not in ROOTUSERS:
+                log.Logger.warning(warmessage = f"User {user} isn't Root.")
         elif inp.startswith('mk '):
             try:
                 filetm = inp[3:]
                 aystm = input(f"Are you sure you want to make {filetm} ? (y/n) : ")
                 if aystm == 'y':
                     with open(filetm, 'w') as f:
-                        print(f"Maked {filetm}.")
+                        log.Logger.info(infmessage = f"Maked {filetm}.")
                 elif aystm == 'n':
-                    print("Canceled operation")
+                    pass
                 else:
-                    print("Invalid Input")
+                    log.Logger.Error(errmessage = "Invalid Input")
             except Exception as e:
-                print(f"Error while making the file : {e}")
+                log.Logger.Error(errmessage = f"Couldn't make the file {filetm}.")
         else:
-            print("Wrong command, view 'help' for help.")
+            log.Logger.warning(warmessage = "Invalid Command : View 'help' to view all commands.")
