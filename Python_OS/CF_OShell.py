@@ -13,6 +13,8 @@ import log
 
 colorama.init()
 
+wrong_inputs = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'z']
+
 timezone = pytz.timezone("Europe/Paris")
 
 WELCOME_MESSAGE = colorama.Fore.YELLOW + "Welcome to CF-OShell! Type 'help' for a list of commands." + colorama.Style.RESET_ALL
@@ -33,8 +35,11 @@ def login():
         if password == USERS[username]:
             print(f"Welcome back, {username}!")
             cmd(username)
-        else:
-            log.Logger.Error(errmessage = "Invalid Input")
+        elif password == '':
+            log.Logger.Error(errmessage = "No Password")
+            login()
+        elif password != USERS[username]:
+            log.Logger.Error(errmessage = "Wrong Password")
             login()
     else:
         newuser(username)
@@ -43,15 +48,15 @@ def login():
 def newuser(username):
     global USERS # Declare USERS as a global variable
     new_account = input("Do you want to create a new account? (y/n) ").lower()
-    is_root = input("Is the User Root ? (y/n) : ")
     if new_account == 'y':
+        is_root = input("Is the User Root ? (y/n) : ")
         password = getpass.getpass(prompt = "New Password: ").lower()
         USERS[username] = password
         if is_root == 'y':
             ROOTUSERS.append(username)
         elif is_root == 'n':
             pass
-        else:
+        elif is_root or new_account in wrong_inputs:
             log.Logger.Error(errmessage = "Invalid input")
         login()
     else:
@@ -95,6 +100,8 @@ def cmd(user):
                   cd : Change directory
                   open : Open a file
                   ren : Rename a file
+                  rm : Remove a file
+                  mk : Make a file
                   """)
         elif inp == 'ver':
             print("CF OS Version: Pre-Beta 0.0.1")
@@ -202,5 +209,7 @@ def cmd(user):
                     log.Logger.Error(errmessage = "Invalid Input")
             except Exception as e:
                 log.Logger.Error(errmessage = f"Couldn't make the file {filetm}.")
+        elif inp == 'whoami':
+            log.Logger.info(infmessage = f"User : {user}")
         else:
             log.Logger.warning(warmessage = "Invalid Command : View 'help' to view all commands.")
