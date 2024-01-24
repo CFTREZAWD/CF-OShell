@@ -10,6 +10,8 @@ import stat
 from datetime import datetime
 import pytz
 import log
+import functools
+import send2trash
 
 colorama.init()
 
@@ -184,16 +186,25 @@ def cmd(user):
             if user in ROOTUSERS:
                 try:
                     filetd = inp[3:]
-                    rm_yn = input(f"Are you sure you want to delete {filetd} ? (y/n) : ")
+                    rm_yn = input(f"Are you sure you want to delete/send to trash {filetd} ? (y/n) : ")
                     if rm_yn == 'y':
-                        os.remove(filetd)
-                        log.Logger.info(infmessage = f"File {filetd} Removed.")
+                        rmorsend = input("Remove or Send to Trash ? (rm/st) : ")
+                        if rmorsend == 'rm':
+                            os.remove(filetd)
+                            log.Logger.info(infmessage = f"File {filetd} Removed.")
+                        elif rmorsend == 'st':
+                            send2trash.send2trash(filetd)
+                            log.Logger.info(infmessage = f"File {filetd} sended to trash.")
+                        elif rmorsend == wrong_inputs:
+                            log.Logger.Warning(errmessage= "Wrong Input ! :)")
                     elif rm_yn == 'n':
                         pass
                     else:
                         log.Logger.Error(errmessage = f"Invalid input")
                 except FileNotFoundError:
                     log.Logger.Error(errmessage = f"File {filetd} wasn't found.")
+                except PermissionError:
+                    log.Logger.Error(errmessage = "Access Denied ! (It's surely a important file or Directory)")
             elif user not in ROOTUSERS:
                 log.Logger.warning(warmessage = f"User {user} isn't Root.")
         elif inp.startswith('mk '):
