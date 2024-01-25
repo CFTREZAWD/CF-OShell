@@ -11,7 +11,8 @@ color_map = {
         'exec': colorama.Fore.MAGENTA
     }
 
-prompt = f"{colorama.Fore.MAGENTA}CF-OShell>{colorama.Style.RESET_ALL}"
+cwd_path = colorama.Fore.CYAN + os.getcwd() + colorama.Style.RESET_ALL
+prompt = f"{colorama.Fore.MAGENTA}CF-OShell {colorama.Fore.BLUE}{cwd_path}>{colorama.Style.RESET_ALL}"
 
 
 
