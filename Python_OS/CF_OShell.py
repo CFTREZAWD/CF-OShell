@@ -12,6 +12,8 @@ import pytz
 import log
 import functools
 import send2trash
+from tqdm import tqdm
+import sys
 
 colorama.init()
 
@@ -83,10 +85,9 @@ def ls():
 
 def cmd(user):
     global current_directory
-    cwd_path = colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL
     print_welcome_message()
     while True:
-        inp = input(f"\n{prompt} {cwd_path}{colorama.Fore.BLUE}${colorama.Style.RESET_ALL} ")
+        inp = input(f"\n{prompt}")
         if inp == 'help':
             print("""
                  
@@ -95,7 +96,7 @@ def cmd(user):
                   echo : Display the prompt
                   cf : Surprise
                   team : Credits
-                  exit : Exit the shell
+                  logout : Logout from the current account
                   wms : Open the Webhook Message Sender for Discord
                   ip : Show your public IP address
                   ls : Show what's in the current directory
@@ -119,7 +120,7 @@ def cmd(user):
             print("Made by CFTREZAWD")
         elif inp == '':
             pass
-        elif inp == 'exit':
+        elif inp == 'logout':
             exit_yn = input("Do you want to logout? (y/n) ")
             if exit_yn == 'y':
                 login()
@@ -148,11 +149,11 @@ def cmd(user):
                 continue
 
             current_directory = os.getcwd()
-            # Update the cwd_path variable after changing the current directory
-            cwd_path = colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL
             
         elif inp.startswith('open '):
             filename = inp[5:]
+            for i in tqdm(range(100)):
+                time.sleep(0.1)
             try:
                 with open(filename) as f:
                     lines = f.read()
@@ -160,8 +161,10 @@ def cmd(user):
                         print(line, end='')
             except FileNotFoundError:
                 log.Logger.Error(errmessage = f"File {filename} wasn't found.")
+            except PermissionError:
+                log.Logger.Error(errmessage = f"You don't have the permission to open the file.")
             except Exception:
-                log.Logger.Error(errmessage = f"cannot opened File {filename}")
+                log.Logger.Error(errmessage = f"Cannot opened File {filename}")
         elif inp.startswith('ren '):
             if user in ROOTUSERS:    
                 try:
@@ -179,9 +182,6 @@ def cmd(user):
                     log.Logger.Error(errmessage = f"File {file1} wasn't found.")
             elif user not in ROOTUSERS:
                 log.Logger.warning(errmessage = f"User {user} isn't root.")
-        elif inp == 'date':
-            date = datetime.now(timezone)
-            print(date)
         elif inp.startswith('rm '):
             if user in ROOTUSERS:
                 try:
