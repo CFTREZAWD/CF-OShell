@@ -5,15 +5,16 @@ import requests
 import wms
 import os
 import colorama
-from config import color_map, prompt
+from config import color_map
 import stat
-from datetime import datetime
 import pytz
 import log
 import functools
 import send2trash
 from tqdm import tqdm
 import sys
+
+
 
 colorama.init()
 
@@ -30,10 +31,10 @@ current_directory = os.getcwd()
 
 ROOTUSERS = ['root']
 USERS = {'root': 'root'}
-COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk']
+COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk', 'open', 'whoami']
 
 def login():
-    username = input("Username: ").lower()
+    username = input("Username: ")
     if username in USERS:
         password = getpass.getpass(prompt = "Password: ").lower()
         if password == USERS[username]:
@@ -51,7 +52,7 @@ def login():
 
 def newuser(username):
     global USERS # Declare USERS as a global variable
-    new_account = input("Do you want to create a new account? (y/n) ").lower()
+    new_account = input("Do you want to create a new account? (y/n) ")
     if new_account == 'y':
         is_root = input("Is the User Root ? (y/n) : ")
         password = getpass.getpass(prompt = "New Password: ").lower()
@@ -76,7 +77,7 @@ def ls():
 
         if stat.S_ISDIR(file_stat.st_mode):
             print(color_map['dir'] + file_or_directory + colorama.Style.RESET_ALL)
-        elif stat.S_ISREG(file_stat.st_mode) and file_or_directory.endswith('.py'):
+        elif stat.S_ISREG(file_stat.st_mode) and file_or_directory.endswith('.py' or '.go'):
             print(color_map['code'] + file_or_directory + colorama.Style.RESET_ALL)
         elif stat.S_ISREG(file_stat.st_mode) and file_or_directory.endswith('.exe'):
             print(color_map['exec'] + file_or_directory + colorama.Style.RESET_ALL)
@@ -85,7 +86,10 @@ def ls():
 
 def cmd(user):
     global current_directory
+    global cwd_path
     print_welcome_message()
+    cwd_path = f"{colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL}"
+    prompt = f"{colorama.Fore.MAGENTA}CF-OShell {colorama.Fore.BLUE}{cwd_path}>{colorama.Style.RESET_ALL}"
     while True:
         inp = input(f"\n{prompt}")
         if inp == 'help':
@@ -105,6 +109,7 @@ def cmd(user):
                   ren : Rename a file
                   rm : Remove a file
                   mk : Make a file
+                  whoami : See the current User
                   """)
         elif inp == 'ver':
             print("CF OS Version: Pre-Beta 0.0.1")
@@ -126,11 +131,14 @@ def cmd(user):
                 login()
             elif exit_yn == 'n':
                 pass
-            else:
+            elif exit_yn in wrong_inputs:
                 log.Logger.Error(errmessage = "Invalid input")
         elif inp == 'wms':
-            wms.wms()
-            log.Logger.info(infmessage = "Opened WMS")
+            try:
+                wms.wms()
+                log.Logger.info(infmessage = "Opened WMS")
+            except Exception:
+                log.Logger.Error(errmessage = "Failed to open WMS")
         elif inp == 'ip':
             ip = requests.get("https://api.ipify.org").text
             print(ip)
@@ -140,25 +148,35 @@ def cmd(user):
             directory = inp[3:].strip()
             if directory == '..':
                 os.chdir('..')
+                cwd_path = f"{colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL}"
+                prompt = f"{colorama.Fore.MAGENTA}CF-OShell {colorama.Fore.BLUE}{cwd_path}>{colorama.Style.RESET_ALL}"
             elif directory == '~':
                 os.chdir(os.path.expanduser('~'))
+                cwd_path = f"{colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL}"
+                prompt = f"{colorama.Fore.MAGENTA}CF-OShell {colorama.Fore.BLUE}{cwd_path}>{colorama.Style.RESET_ALL}"
             elif os.path.exists(directory):
                 os.chdir(directory)
+                cwd_path = f"{colorama.Fore.CYAN + os.path.basename(os.getcwd()) + colorama.Style.RESET_ALL}"
+                prompt = f"{colorama.Fore.MAGENTA}CF-OShell {colorama.Fore.BLUE}{cwd_path}>{colorama.Style.RESET_ALL}"
             else:
                 print(f"Error: Directory '{directory}' not found.")
                 continue
-
             current_directory = os.getcwd()
+            
+            
+
+            
             
         elif inp.startswith('open '):
             filename = inp[5:]
-            for i in tqdm(range(100)):
+            for i in tqdm(range(random.randint(20, 100))):
                 time.sleep(0.1)
             try:
                 with open(filename) as f:
                     lines = f.read()
-                    for i, line in enumerate(lines):
-                        print(line, end='')
+                    print('')
+                    print(f"{colorama.Fore.BLUE}{lines}{colorama.Style.RESET_ALL}", end='')
+                    print('')
             except FileNotFoundError:
                 log.Logger.Error(errmessage = f"File {filename} wasn't found.")
             except PermissionError:
@@ -176,7 +194,7 @@ def cmd(user):
                         log.Logger.info(infmessage = f"Renamed {file1} to {newname}")
                     elif ren_yn == 'n':
                         pass
-                    else:
+                    elif ren_yn in wrong_inputs:
                         log.Logger.Error(errmessage = f"Invalid Input")
                 except FileNotFoundError:
                     log.Logger.Error(errmessage = f"File {file1} wasn't found.")
@@ -195,7 +213,7 @@ def cmd(user):
                         elif rmorsend == 'st':
                             send2trash.send2trash(filetd)
                             log.Logger.info(infmessage = f"File {filetd} sended to trash.")
-                        elif rmorsend == wrong_inputs:
+                        elif rmorsend in wrong_inputs:
                             log.Logger.Warning(errmessage= "Wrong Input ! :)")
                     elif rm_yn == 'n':
                         pass
@@ -218,7 +236,7 @@ def cmd(user):
                     pass
                 else:
                     log.Logger.Error(errmessage = "Invalid Input")
-            except Exception as e:
+            except Exception:
                 log.Logger.Error(errmessage = f"Couldn't make the file {filetm}.")
         elif inp == 'whoami':
             log.Logger.info(infmessage = f"User : {user}")
