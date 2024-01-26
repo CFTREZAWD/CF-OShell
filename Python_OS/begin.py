@@ -1,11 +1,11 @@
 import time
-from CF_OShell import prompt
 import CF_OShell
+from tqdm import tqdm
 
 def boot():
     print("Welcome to CF-OShell. The worst shell ever created ! ")
-    time.sleep(5)
-    print("Booting...")
+    for i in tqdm(range(100)):
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     boot()
