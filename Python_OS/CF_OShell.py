@@ -13,8 +13,15 @@ import functools
 import send2trash
 from tqdm import tqdm
 import sys
+import platform
+import psutil
+import wmi
+import cpuinfo
 
-
+pc = wmi.WMI
+CPU = cpuinfo.get_cpu_info()
+OS = platform.platform()
+NetName = platform.node()
 
 colorama.init()
 
@@ -31,7 +38,7 @@ current_directory = os.getcwd()
 
 ROOTUSERS = ['root']
 USERS = {'root': 'root'}
-COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk', 'open', 'whoami']
+COMMANDS = ['help', 'ver', 'team', 'exit', 'ip', 'wms', 'cd', 'ls', 'ren', 'rm', 'mk', 'open', 'whoami', 'hello', 'pcinf']
 
 def login():
     username = input("Username: ")
@@ -50,7 +57,7 @@ def login():
         newuser(username)
 
 
-def newuser(username):
+def newuser(username: str):
     global USERS # Declare USERS as a global variable
     new_account = input("Do you want to create a new account? (y/n) ")
     if new_account == 'y':
@@ -66,6 +73,15 @@ def newuser(username):
         login()
     else:
         login()
+
+def pc_infos():
+    print(f"OS : {OS}")
+    print(f"CPU : {CPU['brand_raw']}")
+    log.Logger.Error("Failed to retrieve GPU Infos")
+    print(f"Architecture : {CPU['arch']}")
+    print(f"GB of RAM : {psutil.virtual_memory().total / 1024 / 1024 / 1024:.0f} GB")
+    print(f"NetWork Name : {NetName}")
+
 
 def ls():
     global current_directory
@@ -110,6 +126,8 @@ def cmd(user):
                   rm : Remove a file
                   mk : Make a file
                   whoami : See the current User
+                  hello : Say Hello
+                  pcinf : Show the PC Infos
                   """)
         elif inp == 'ver':
             print("CF OS Version: Pre-Beta 0.0.1")
@@ -163,17 +181,14 @@ def cmd(user):
                 continue
             current_directory = os.getcwd()
             
-            
-
-            
-            
         elif inp.startswith('open '):
             filename = inp[5:]
-            for i in tqdm(range(random.randint(20, 100))):
-                time.sleep(0.1)
+            for i in tqdm(range(random.randint(10, 100))):
+                        time.sleep(0.1)
             try:
                 with open(filename) as f:
                     lines = f.read()
+                    
                     print('')
                     print(f"{colorama.Fore.BLUE}{lines}{colorama.Style.RESET_ALL}", end='')
                     print('')
@@ -181,8 +196,6 @@ def cmd(user):
                 log.Logger.Error(errmessage = f"File {filename} wasn't found.")
             except PermissionError:
                 log.Logger.Error(errmessage = f"You don't have the permission to open the file.")
-            except Exception:
-                log.Logger.Error(errmessage = f"Cannot opened File {filename}")
         elif inp.startswith('ren '):
             if user in ROOTUSERS:    
                 try:
@@ -240,5 +253,10 @@ def cmd(user):
                 log.Logger.Error(errmessage = f"Couldn't make the file {filetm}.")
         elif inp == 'whoami':
             log.Logger.info(infmessage = f"User : {user}")
+
+        elif inp == 'hello':
+            print(f"Hello, {user} !")
+        elif inp == 'pcinf':
+            pc_infos()
         else:
             log.Logger.warning(warmessage = "Invalid Command : View 'help' to view all commands.")
